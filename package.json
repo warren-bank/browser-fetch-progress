@@ -1,0 +1,24 @@
+{
+  "name": "@warren-bank/browser-fetch-progress",
+  "description": "A middleware function for use with the browser 'Fetch API' to provide download progress updates.",
+  "version": "1.0.0",
+  "license": "GPL-2.0",
+  "files": [
+    "src"
+  ],
+  "main": "src/fetch-progress.js",
+  "browser": "src/fetch-progress.js",
+  "author": {
+    "name": "Warren R. Bank",
+    "email": "warren.r.bank@gmail.com",
+    "url": "https://github.com/warren-bank"
+  },
+  "homepage": "https://github.com/warren-bank/browser-fetch-progress",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/warren-bank/browser-fetch-progress"
+  },
+  "bugs": {
+    "url": "https://github.com/warren-bank/browser-fetch-progress/issues"
+  }
+}

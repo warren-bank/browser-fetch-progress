@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>unit test: pass-through conditions</title>
+    <script src="../../src/fetch-progress.js"></script>
+    <script>
+      const init = async () => {
+        const default_options = {
+          progressHandler: show_progress,
+          mode: 'cors'
+        }
+
+        // OK
+        await run_test(2, Object.assign({}, default_options))
+        await run_test(3, Object.assign({}, default_options))
+
+        // pass-through conditions
+        await run_test(2, Object.assign({}, default_options, {progressHandler: null}))
+        await run_test(2, Object.assign({}, default_options, {mode: 'no-cors'}))
+        await run_test(4, Object.assign({}, default_options))
+      }
+
+      const run_test = async (which, options) => {
+        const url = get_url(which)
+
+        show_divider(2)
+        show_result(`url:\n  ${url}`)
+        show_divider()
+        show_progress({progress: 0})
+
+        const ResponseWrapper = await fetch(url, {mode: options.mode})
+          .then(fetchProgress(options.progressHandler))
+
+        show_divider()
+        show_result(`fetchProgress()\n  returns Response: ${ResponseWrapper instanceof Response}`)
+        show_divider()
+        show_result(`res.status\n  value: ${ResponseWrapper.status}\n  redirected: ${ResponseWrapper.redirected}`)
+        show_divider()
+        show_result(`res.type\n  value: ${ResponseWrapper.type}`)
+        show_divider()
+        show_result(`res.body\n  value: ${ResponseWrapper.body}`)
+      }
+
+      const get_url = (which) => {
+        switch(which) {
+          case 4:
+            return 'https://httpbin.org/status/400'
+
+          case 3:
+            return 'https://httpbin.org/redirect-to?status_code=302&url=/headers'
+
+          case 2:
+            return 'https://httpbin.org/headers'
+
+          case 1:
+          default:
+            return 'https://github.com/warren-bank/browser-fetch-progress/raw/master/package.json'
+        }
+      }
+
+      const show_result = (text) => {
+        document.getElementById('result').appendChild(
+          document.createTextNode(text + "\n")
+        )
+      }
+
+      const show_progress = (event) => {
+        show_result(`download is ${event.progress * 100} percent complete..`)
+      }
+
+      const show_divider = (multiple = 1) => {
+        show_result("\n" + ('-').repeat(40 * multiple) + "\n\n")
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </head>
+  <body>
+    <pre id="result"></pre>
+  </body>
+</html>

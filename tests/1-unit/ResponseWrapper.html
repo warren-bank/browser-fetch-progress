@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>unit test: ResponseWrapper</title>
+    <script src="../../src/fetch-progress.js"></script>
+    <script>
+      const init = async () => {
+        await run_test(2)
+      }
+
+      const run_test = async (which) => {
+        const url = get_url(which)
+
+        show_divider(2)
+        show_result(`url:\n  ${url}`)
+        show_divider()
+        show_progress({progress: 0})
+
+        const ResponseWrapper = await fetch(url)
+          .then(fetchProgress(show_progress))
+
+        show_divider()
+        show_result(`bytes()\n  returns Uint8Array: ${ResponseWrapper.bytes() instanceof Uint8Array}\n  length: ${ResponseWrapper.bytes().byteLength} bytes`)
+        show_divider()
+        show_result(`arrayBuffer()\n  returns ArrayBuffer: ${ResponseWrapper.arrayBuffer() instanceof ArrayBuffer}\n  length: ${ResponseWrapper.arrayBuffer().byteLength} bytes`)
+        show_divider()
+        show_result(`blob()\n  returns Blob: ${ResponseWrapper.blob() instanceof Blob}\n  length: ${ResponseWrapper.blob().size} bytes`)
+        show_divider()
+        show_result(`text()\n  returns String: ${typeof ResponseWrapper.text() === 'string'}\n  length: ${ResponseWrapper.text().length} UTF-16 code units`)
+        show_divider()
+        switch(which) {
+          case 2:
+            show_result(`json()\n  returns Object: ${typeof ResponseWrapper.json() === 'object'}\n  count: ${Object.keys(ResponseWrapper.json().headers).length} HTTP request headers`)
+            break
+          case 1:
+          default:
+            show_result(`json()\n  returns Object: ${typeof ResponseWrapper.json() === 'object'}\n  version: ${ResponseWrapper.json().version}`)
+            break
+        }
+      }
+
+      const get_url = (which) => {
+        switch(which) {
+          case 2:
+            return 'https://httpbin.org/headers'
+
+          case 1:
+          default:
+            return 'https://github.com/warren-bank/browser-fetch-progress/raw/master/package.json'
+        }
+      }
+
+      const show_result = (text) => {
+        document.getElementById('result').appendChild(
+          document.createTextNode(text + "\n")
+        )
+      }
+
+      const show_progress = (event) => {
+        show_result(`download is ${event.progress * 100} percent complete..`)
+      }
+
+      const show_divider = (multiple = 1) => {
+        show_result("\n" + ('-').repeat(40 * multiple) + "\n\n")
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </head>
+  <body>
+    <pre id="result"></pre>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>e2e test: download large file</title>
+    <script src="../../src/fetch-progress.js"></script>
+    <script>
+      const init = () => {
+        const worker = new Worker(new URL('./download-large-file.worker.js', window.location.href), {type: 'classic'})
+
+        worker.addEventListener('message', (event) => {
+          if (event && (typeof event === 'object') && event.data && (typeof event.data === 'object') && event.data.type) {
+            switch(event.data.type) {
+              case 'progress':
+                show_progress(event.data.event)
+                break
+              case 'alert':
+                window.alert(event.data.message)
+                break
+            }
+          }
+        })
+
+        worker.postMessage('init')
+      }
+
+      const show_progress = (event) => {
+        const $progress = document.getElementById('status-progress')
+        const $label    = $progress.nextSibling
+        $progress.value = event.progress
+        $label.textContent = ' ' + (Math.floor(event.progress * 1000) / 10) + ' %'
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </head>
+  <body>
+    <h3>Downloading large file..</h3>
+    <div>
+      <progress id="status-progress" value="0" max="1"></progress><label> 0 %</label>
+    </div>
+  </body>
+</html>
